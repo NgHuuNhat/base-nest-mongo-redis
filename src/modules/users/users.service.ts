@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { ClientSession, Connection, QueryFilter } from 'mongoose';
@@ -14,6 +14,7 @@ import { GetUsersQueryDto } from './dto/get-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserDocument } from './schema/user.schema';
 import { UsersRepository } from './user.repository';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService extends BaseService<UserDocument> {
@@ -58,5 +59,25 @@ export class UsersService extends BaseService<UserDocument> {
     await this.cacheService.setJson(cacheKey, paginateResult, DEFAULT_TTL);
 
     return paginateResult;
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
+
+    const exist = await this.usersRepository.findOne({
+      email: createUserDto.email,
+    })
+
+    if (exist) {
+      throw new BadRequestException('Email already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, DEFAULT_SALT);
+
+    const user = await this.create({
+      ...createUserDto,
+      password: hashedPassword,
+    })
+
+    return user;
   }
 }
