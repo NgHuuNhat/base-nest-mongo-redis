@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
@@ -43,7 +43,7 @@ export class AuthService {
       user: {
         id: user._id,
         email: user.email,
-        name: user.name,
+        full_name: user.full_name,
       },
       accessToken,
       refreshToken,

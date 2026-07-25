@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
     @ApiProperty({ example: 'Nguyen Huu Nhat' })
@@ -23,9 +23,18 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'Required' })
     phone: string;
 
-    @ApiProperty({ example: 'USER' })
+    @ApiProperty({ example: 'admin' })
     @IsString({ message: 'Invalid string' })
     @IsNotEmpty({ message: 'Required' })
     role: string;
+
+    @ApiProperty({
+        type: [String],
+        example: ['TP.HCM', 'Ha Noi'],
+    })
+    @IsArray({ message: 'Addresses must be an array' })
+    @IsString({ each: true, message: 'Each address must be a string' })
+    @IsNotEmpty({ each: true, message: 'Address is required' })
+    addresses: string[];
 
 }
